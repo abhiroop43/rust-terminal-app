@@ -1,22 +1,30 @@
 use std::io::{self};
 
+mod app_state;
+use app_state::AppState;
+
 use ratatui::{
     crossterm::{
-        event::{self, Event, KeyCode},
+        event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
+        execute,
         terminal::{disable_raw_mode, enable_raw_mode},
     },
     layout::{Constraint, Direction, Layout},
     prelude::CrosstermBackend,
-    style::{Color, Style},
+    style::{Color, Modifier, Style},
     widgets::{Block, Borders, List, ListItem},
     Terminal,
 };
 
 fn main() -> Result<(), io::Error> {
     enable_raw_mode()?;
+
     let mut stdout = io::stdout();
+    execute!(stdout, EnableMouseCapture)?;
+
     let backend = CrosstermBackend::new(&mut stdout);
     let mut terminal = Terminal::new(backend)?;
+    let mut app_state = AppState::new();
 
     terminal.clear()?;
 
@@ -35,11 +43,22 @@ fn main() -> Result<(), io::Error> {
             let block2 = Block::default().title("Block 2").borders(Borders::ALL);
             f.render_widget(block2, chunks[1]);
 
-            let items = vec![
-                ListItem::new("Item 1").style(Style::default().fg(Color::Red)),
-                ListItem::new("Item 2").style(Style::default().fg(Color::Green)),
-                ListItem::new("Item 3").style(Style::default().fg(Color::Blue)),
-            ];
+            let items: Vec<ListItem> = app_state
+                .items
+                .iter()
+                .enumerate()
+                .map(|(i, item)| {
+                    let style = if i == app_state.selected {
+                        Style::default()
+                            .fg(Color::Yellow)
+                            .add_modifier(Modifier::BOLD)
+                    } else {
+                        Style::default().fg(Color::Reset)
+                    };
+
+                    ListItem::new(item.clone()).style(style)
+                })
+                .collect();
 
             let list =
                 List::new(items).block(Block::default().title("List Block").borders(Borders::ALL));
@@ -49,12 +68,22 @@ fn main() -> Result<(), io::Error> {
 
         // handle events
         if let Event::Key(key) = event::read()? {
-            if key.code == KeyCode::Char('q') {
-                break;
+            match key.code {
+                KeyCode::Char('q') => break,
+                KeyCode::Up => app_state.previous(),
+                KeyCode::Down => app_state.next(),
+                _ => {}
             }
+        }
+
+        if let Event::Mouse(_mouse_event) = event::read()? {
+            //TODO: Handle mouse events
         }
     }
 
+    drop(terminal);
+
     disable_raw_mode()?;
+    execute!(stdout, DisableMouseCapture)?;
     Ok(())
 }
