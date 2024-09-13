@@ -72,9 +72,9 @@ This file contains the main logic for rendering the UI and handling input. It se
 
 ## Dependencies
 
-Ratatui: A Rust library for building rich terminal user interfaces.
-Crossterm: Cross-platform library for handling terminal I/O.
-Rust: Programming language for safe and fast system-level development.
+- Ratatui: A Rust library for building rich terminal user interfaces.
+- Crossterm: Cross-platform library for handling terminal I/O.
+- Rust: Programming language for safe and fast system-level development.
 
 ## Contributing
 
