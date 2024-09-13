@@ -4,26 +4,26 @@ pub struct AppState {
 }
 
 impl AppState {
-  pub fn new() -> AppState {
-    AppState {
-      items: vec![
-        "Item 1".to_string(),
-        "Item 2".to_string(),
-        "Item 3".to_string(),
-      ],
-      selected: 0,
+    pub fn new() -> AppState {
+        AppState {
+            items: vec![
+                "Exercise".to_string(),
+                "Meditate".to_string(),
+                "Journal".to_string(),
+            ],
+            selected: 0,
+        }
     }
-  }
 
-  pub fn next(&mut self) {
-    self.selected = (self.selected + 1) % self.items.len();
-  }
-
-  pub fn previous(&mut self) {
-    if self.selected == 0 {
-      self.selected = self.items.len() - 1;
-    } else {
-      self.selected -= 1;
+    pub fn next(&mut self) {
+        self.selected = (self.selected + 1) % self.items.len();
     }
-  }
+
+    pub fn previous(&mut self) {
+        if self.selected == 0 {
+            self.selected = self.items.len() - 1;
+        } else {
+            self.selected -= 1;
+        }
+    }
 }

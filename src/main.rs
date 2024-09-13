@@ -37,11 +37,11 @@ fn main() -> Result<(), io::Error> {
                 .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
                 .split(size);
 
-            let block1 = Block::default().title("Block 1").borders(Borders::ALL);
-            f.render_widget(block1, chunks[0]);
+            // let block1 = Block::default().title("Block 1").borders(Borders::ALL);
+            // f.render_widget(block1, chunks[0]);
 
-            let block2 = Block::default().title("Block 2").borders(Borders::ALL);
-            f.render_widget(block2, chunks[1]);
+            // let block2 = Block::default().title("Block 2").borders(Borders::ALL);
+            // f.render_widget(block2, chunks[1]);
 
             let items: Vec<ListItem> = app_state
                 .items
@@ -56,12 +56,12 @@ fn main() -> Result<(), io::Error> {
                         Style::default().fg(Color::Reset)
                     };
 
-                    ListItem::new(item.clone()).style(style)
+                    ListItem::new(format!("{}. {}", (i + 1), item)).style(style)
                 })
                 .collect();
 
-            let list =
-                List::new(items).block(Block::default().title("List Block").borders(Borders::ALL));
+            let list = List::new(items)
+                .block(Block::default().title("Things to do").borders(Borders::ALL));
 
             f.render_widget(list, chunks[0]);
         })?;
@@ -76,9 +76,8 @@ fn main() -> Result<(), io::Error> {
             }
         }
 
-        if let Event::Mouse(_mouse_event) = event::read()? {
-            //TODO: Handle mouse events
-        }
+        // if let Event::Mouse(_mouse_event) = event::read()? {
+        // }
     }
 
     drop(terminal);
