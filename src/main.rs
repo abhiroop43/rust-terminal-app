@@ -7,7 +7,8 @@ use ratatui::{
     },
     layout::{Constraint, Direction, Layout},
     prelude::CrosstermBackend,
-    widgets::{Block, Borders},
+    style::{Color, Style},
+    widgets::{Block, Borders, List, ListItem},
     Terminal,
 };
 
@@ -33,6 +34,17 @@ fn main() -> Result<(), io::Error> {
 
             let block2 = Block::default().title("Block 2").borders(Borders::ALL);
             f.render_widget(block2, chunks[1]);
+
+            let items = vec![
+                ListItem::new("Item 1").style(Style::default().fg(Color::Red)),
+                ListItem::new("Item 2").style(Style::default().fg(Color::Green)),
+                ListItem::new("Item 3").style(Style::default().fg(Color::Blue)),
+            ];
+
+            let list =
+                List::new(items).block(Block::default().title("List Block").borders(Borders::ALL));
+
+            f.render_widget(list, chunks[0]);
         })?;
 
         // handle events
