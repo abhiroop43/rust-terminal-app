@@ -12,7 +12,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout},
     prelude::CrosstermBackend,
     style::{Color, Modifier, Style},
-    widgets::{Block, Borders, List, ListItem},
+    widgets::{Block, Borders, List, ListItem, Paragraph},
     Terminal,
 };
 
@@ -26,6 +26,8 @@ fn main() -> Result<(), io::Error> {
     let mut terminal = Terminal::new(backend)?;
     let mut app_state = AppState::new();
 
+    let mut input = String::new();
+
     terminal.clear()?;
 
     loop {
@@ -36,12 +38,6 @@ fn main() -> Result<(), io::Error> {
                 .direction(Direction::Vertical)
                 .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
                 .split(size);
-
-            // let block1 = Block::default().title("Block 1").borders(Borders::ALL);
-            // f.render_widget(block1, chunks[0]);
-
-            // let block2 = Block::default().title("Block 2").borders(Borders::ALL);
-            // f.render_widget(block2, chunks[1]);
 
             let items: Vec<ListItem> = app_state
                 .items
@@ -64,20 +60,40 @@ fn main() -> Result<(), io::Error> {
                 .block(Block::default().title("Things to do").borders(Borders::ALL));
 
             f.render_widget(list, chunks[0]);
+
+            let input_block = Paragraph::new::<&str>(input.as_ref())
+                .block(Block::default().title("Add Item").borders(Borders::ALL))
+                .style(Style::default().fg(Color::White));
+
+            f.render_widget(input_block, chunks[1]);
         })?;
 
         // handle events
         if let Event::Key(key) = event::read()? {
             match key.code {
-                KeyCode::Char('q') => break,
-                KeyCode::Up => app_state.previous(),
-                KeyCode::Down => app_state.next(),
+                KeyCode::Char(c) => {
+                    input.push(c);
+                }
+                KeyCode::Backspace => {
+                    input.pop();
+                }
+                KeyCode::Enter => {
+                    app_state.items.push(input.clone());
+                    input.clear();
+                }
+                KeyCode::Esc => {
+                    terminal.clear()?;
+                    break;
+                }
+                KeyCode::Up => {
+                    app_state.previous();
+                }
+                KeyCode::Down => {
+                    app_state.next();
+                }
                 _ => {}
             }
         }
-
-        // if let Event::Mouse(_mouse_event) = event::read()? {
-        // }
     }
 
     drop(terminal);
