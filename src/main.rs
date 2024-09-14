@@ -26,7 +26,10 @@ fn main() -> Result<(), io::Error> {
     let mut terminal = Terminal::new(backend)?;
     let mut app_state = AppState::new();
 
-    let mut input = String::new();
+    let mut task_title = String::new();
+    let mut task_description = String::new();
+
+    let mut focus_index = 0;
 
     terminal.clear()?;
 
@@ -61,9 +64,17 @@ fn main() -> Result<(), io::Error> {
 
             f.render_widget(list, chunks[0]);
 
-            let input_block = Paragraph::new::<&str>(input.as_ref())
-                .block(Block::default().title("Add Item").borders(Borders::ALL))
-                .style(Style::default().fg(Color::White));
+            let input_style = if focus_index == 0 {
+                Style::default()
+                    .fg(Color::Yellow)
+                    .add_modifier(Modifier::BOLD)
+            } else {
+                Style::default().fg(Color::White)
+            };
+
+            let input_block = Paragraph::new::<&str>(task_title.as_ref())
+                .block(Block::default().title("Title").borders(Borders::ALL))
+                .style(input_style);
 
             f.render_widget(input_block, chunks[1]);
         })?;
@@ -72,14 +83,23 @@ fn main() -> Result<(), io::Error> {
         if let Event::Key(key) = event::read()? {
             match key.code {
                 KeyCode::Char(c) => {
-                    input.push(c);
+                    if focus_index == 0 {
+                        task_title.push(c);
+                    }
                 }
                 KeyCode::Backspace => {
-                    input.pop();
+                    if focus_index == 0 {
+                        task_title.pop();
+                    }
+                }
+                KeyCode::Tab => {
+                    focus_index = (focus_index + 1) % 1;
                 }
                 KeyCode::Enter => {
-                    app_state.items.push(input.clone());
-                    input.clear();
+                    if !task_title.is_empty() {
+                        app_state.items.push(task_title.clone());
+                        task_title.clear();
+                    }
                 }
                 KeyCode::Esc => {
                     terminal.clear()?;
