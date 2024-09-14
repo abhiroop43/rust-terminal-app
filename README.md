@@ -59,9 +59,15 @@ Once the application is running:
 
 ```less
 src/
-  ├── app_state.rs     // Manages application state (items, selection logic)
-  ├── main.rs          // Main entry point and UI logic
-Cargo.toml             // Project dependencies
+  ├── main.rs              // Main entry point, calls functions from other modules
+  ├── app.rs               // Manages the application's logic (state, form handling, etc.)
+  ├── ui.rs                // Responsible for drawing the terminal UI
+  ├── input.rs             // Handles user input (keyboard and form interaction)
+  ├── task.rs              // Defines the Task struct and related functionality
+  ├── app_state.rs         // Manages application state, including task management
+  └── utils.rs             // Utility functions (optional)
+Cargo.toml                 // Project dependencies and configuration
+           // Project dependencies
 ```
 
 `app_state.rs`
